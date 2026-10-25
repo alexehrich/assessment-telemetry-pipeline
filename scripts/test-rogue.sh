@@ -25,7 +25,7 @@ docker compose --profile rogue rm -sf rogue-impersonator rogue-unlisted >/dev/nu
 echo
 echo "== receiver log"
 log=$(docker compose logs --no-log-prefix --since "$start_s" receiver)
-echo "$log" | grep rejected | sed -E 's/\(.[0-9.]+., [0-9]+\)//' | sort | uniq -c | sed -E 's/ [0-9-]+ [0-9:,]+ receiver WARNING//'
+echo "$log" | grep -o 'rejected .*' | sed -E "s/^rejected \('[0-9.]+', [0-9]+\)/rejected/" | sort | uniq -c
 
 fail=0
 check() {

@@ -10,7 +10,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 CERTS=certs
-SERVER_NAME=${SERVER_NAME:-tactical-server}  # the name instances dial (see README, "Toxiproxy and TLS")
+SERVER_NAME=${SERVER_NAME:-tactical-server}  # the name instances dial (see README, "Toxiproxy and the server name")
 LEAF_VALIDITY=${LEAF_VALIDITY:-2160h}         # 90 days
 CA_VALIDITY=${CA_VALIDITY:-87600h}            # 10 years
 
@@ -56,8 +56,8 @@ while read -r team; do
 done < <(grep -Ev '^\s*(#|$)' teams.txt)
 
 # Two certificates for the rejection test (scripts/test-rogue.sh):
-#  rogue-ca      claims to be team-a, but is signed by a different CA.
-#  rogue-unlisted is signed by our CA, but its identity is not in teams.txt.
+#  rogue-impersonator  claims to be team 1, but is signed by a different CA (rogue-ca).
+#  rogue-unlisted      is signed by our CA, but its identity is not in teams.txt.
 if [[ ! -f $CERTS/rogue-ca/root_ca.crt ]]; then
   mkdir -p "$CERTS/rogue-ca"
   step certificate create "Rogue CA" rogue-ca/root_ca.crt rogue-ca/root_ca.key \

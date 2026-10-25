@@ -1,7 +1,7 @@
 # Secure telemetry pipeline over unreliable connections
 
-Forwards drone telemetry from each team's instance to a tactical server, encrypted and
-authenticated with mutual TLS, over a link that drops, slows down and narrows.
+Forwards drone telemetry from each team's instance to a tactical server over mutual TLS,
+through a link that drops, slows down and narrows.
 
 ```mermaid
 flowchart LR
@@ -23,370 +23,258 @@ flowchart LR
   RX -. "ACK after commit" .-> AA
 ```
 
-Each box is a container. Each team LAN, `wan` and `tactical` are internal Docker networks:
-they have no access outside the deployment. The receiver publishes no port, so the only
-way in is through Toxiproxy. The only port on the host is the Toxiproxy API, on
-`127.0.0.1:8474`.
-
-## Contents
-
-- [Running it](#running-it)
-- [Repository layout](#repository-layout)
-- [Part 2: Security and identity](#part-2-security-and-identity)
-- [Part 3: The pipeline](#part-3-the-pipeline)
-- [Part 4: Bad connectivity](#part-4-bad-connectivity)
-- [Part 5: Proof it works](#part-5-proof-it-works)
-- [Part 1: Deployment and idempotency](#part-1-deployment-and-idempotency)
-- [What I would change for production](#what-i-would-change-for-production)
-- [What I would do next](#what-i-would-do-next)
+Every box is a container. The team LANs, `wan` and `tactical` are internal Docker
+networks with no way out. The receiver publishes no port, so the only way in is through
+Toxiproxy, and the only port on the host is the Toxiproxy API on `127.0.0.1:8474`.
 
 ## Running it
 
-Needs Docker with Compose v2, `make`, `python3` (3.10+, stdlib only) and `curl`. Tested on
-macOS and Linux. No step CLI is needed: `scripts/certs.sh` uses the `smallstep/step-cli`
-image when `step` is not installed.
+Needs Docker with Compose v2, `make`, `python3` (3.10+) and `curl`. The step CLI is
+optional: `scripts/certs.sh` falls back to the `smallstep/step-cli` image.
 
 ```sh
 make up              # generate config, create certificates, start everything
 make status          # 6 containers running
 make test-delivery   # every team in teams.txt has data on the tactical server
-make test-rogue      # three kinds of unknown instance are rejected
-make report          # per drone: stored, missing, delivery delay, last 5 minutes
+make test-rogue      # unknown instances are rejected
+make report          # per drone: stored, missing, delivery delay (last 5 min)
 make logs            # follow the receiver and the agents
+
+make short-outage    # 30 s down
+make long-outage     # 10 min down
+make high-latency    # 5 min of 2000 ms ± 500 ms
+make low-bandwidth   # 5 min of 10 KB/s upstream
+scripts/scenario.sh short-outage team-a   # one team only; the other is the control
 ```
 
-The network scenarios from [docs/NETWORK-SCENARIOS.md](docs/NETWORK-SCENARIOS.md), each
-run on every team's proxy and saved to `results/<scenario>.txt`:
+Scenarios use the exact API calls from [docs/NETWORK-SCENARIOS.md](docs/NETWORK-SCENARIOS.md)
+and save their output to `results/`.
 
-```sh
-make short-outage    #  30 s down
-make long-outage     #  10 min down
-make high-latency    #   5 min of 2000 ms ± 500 ms both ways
-make low-bandwidth   #   5 min of 10 KB/s upstream
-scripts/scenario.sh short-outage team-a   # only one team, the other is the control
-```
+To add a team, append it to `teams.txt` and run `make up`. `make down` stops everything,
+`make clean` also deletes stored telemetry (certificates are kept).
 
-To add a team, append its id to `teams.txt` and run `make up`. `make down` stops
-everything; `make clean` also deletes the stored telemetry (certificates are kept).
+## Layout
 
-## Repository layout
-
-| Path | What it is |
-| ---- | ---------- |
-| `teams.txt` | The only list of instances. Everything below is derived from it. |
+| Path | |
+| ---- | - |
+| `teams.txt` | The list of instances. Everything else is derived from it. |
 | `pipeline/agent.py` | Instance agent: UDP in, buffer, mTLS out. |
-| `pipeline/receiver.py` | Tactical-server receiver: mTLS in, validate, store, ack. |
-| `pipeline/protocol.py` | Framing, batches and acks shared by both. |
-| `pipeline/tls.py` | The TLS contexts. |
-| `pipeline/report.py` | Gaps and delays per drone, for the proofs. |
+| `pipeline/receiver.py` | Tactical server: mTLS in, validate, store, ack. |
+| `pipeline/protocol.py` | Framing, batches and acks. |
+| `pipeline/tls.py` | TLS contexts. |
+| `pipeline/report.py` | Gaps and delays per drone, used by the tests. |
 | `scripts/generate.py` | Writes `docker-compose.yml` and `toxiproxy/toxiproxy.json` from `teams.txt`. |
-| `scripts/certs.sh` | Creates the CA and per-node certificates with step. |
-| `scripts/scenario.sh`, `test-*.sh` | Part 5 proofs. |
+| `scripts/certs.sh` | CA and per-node certificates. |
+| `scripts/*.sh` | Delivery, rogue and network scenario tests. |
 | `gcs-sim/` | The provided simulator, unchanged. |
+
+## Part 1: Deployment
+
+`make up` runs three steps, each safe to repeat:
+
+1. `scripts/generate.py` writes the compose file and Toxiproxy config from `teams.txt`.
+   The output is deterministic and only written when it changes. Both files are
+   committed so they can be reviewed.
+2. `scripts/certs.sh` creates the CA and certificates if missing, and re-issues a leaf
+   only when it's close to expiry. Keys are `0600` in `certs/`, which is gitignored.
+3. `docker compose up -d --remove-orphans` converges to the declared state. A team
+   removed from `teams.txt` loses its containers.
+
+A second `make up` changes nothing. Getting there took one fix: my first version ran
+`docker compose up --build`, and BuildKit's provenance attestation gives every build a
+new image id even for identical code, so Compose restarted the agents each time.
+`provenance: false` fixed it on Linux but Docker Desktop ignores it, so now `make` only
+rebuilds when a source file changed (`.build-stamp`).
+
+Containers run read-only, non-root, with all capabilities dropped, `no-new-privileges`,
+no core dumps, and a memory limit on the agents.
+
+Toxiproxy ports are `7001 + position in teams.txt`, so new teams go at the end.
 
 ## Part 2: Security and identity
 
-### Choice: mutual TLS 1.3 with a private CA
+I went with mutual TLS 1.3 and a private CA (created with `step`):
 
-- The pipeline has its own CA, created with `step`. It signs one certificate per
-  instance, with CN = team id, and one for the server, with SAN `tactical-server`.
-- **Encrypted in transit:** TLS 1.3 only. It has forward secrecy, so a key stolen later
-  does not decrypt recorded traffic.
-- **Each instance has its own identity:** its own key pair and certificate. The key
-  never leaves the instance.
-- **Only known instances are accepted.** A client must pass two checks:
-  1. Its certificate is signed by the pipeline CA. Anything else fails the TLS
-     handshake: no certificate (`PEER_DID_NOT_RETURN_A_CERTIFICATE`) or a certificate
-     from another CA (`CERTIFICATE_VERIFY_FAILED`).
-  2. Its CN is in the allowlist, which is generated from `teams.txt`. This makes
-     revocation easy: remove a team from `teams.txt`, run `make up`, and its still-valid
-     certificate is refused.
-- **The identity is bound to the data:** every message in a batch must have
-  `team_id` = the CN of the connection, and `drone_id` = `<CN>-n`. Otherwise the message
-  is discarded. A compromised instance can only lie about its own team, not inject data
-  as another team.
-- **The server is authenticated too:** agents trust only the pipeline CA (not the system
-  store) and check the hostname. A man in the middle with a public certificate is
-  rejected.
-- **Toxiproxy and the server name:** Toxiproxy is a plain TCP proxy, so TLS runs end to
-  end through it. On the `wan` network it has the alias `tactical-server`, the name the
-  server certificate is issued for. Agents dial `tactical-server:700x` and never know a
-  proxy is in between. In a real deployment the name is the tactical server's DNS name.
+- One certificate per instance with CN = team id, one for the server with SAN
+  `tactical-server`. Each instance has its own key.
+- TLS 1.3 only, so forward secrecy: a key stolen later can't decrypt recorded traffic.
+- A client gets in only if its certificate is signed by the pipeline CA (otherwise the
+  handshake fails) **and** its CN is in the allowlist generated from `teams.txt`. Removing
+  a team from `teams.txt` revokes it even though its certificate is still valid.
+- The identity is tied to the data: every message must have `team_id` equal to the
+  connection's CN and `drone_id` = `<CN>-n`, or it's discarded. A compromised instance
+  can only lie about its own team.
+- Agents trust only the pipeline CA, not the system store, and check the hostname.
+- Toxiproxy is a plain TCP proxy, so TLS runs end to end through it. It has the network
+  alias `tactical-server` on `wan`, so agents never know it's there.
 
-### Alternatives considered
+Alternatives I considered:
 
-| Option | Why not |
-| ------ | ------- |
-| WireGuard | Runs over UDP, which Toxiproxy cannot proxy. Otherwise a strong fit: simple keys, built-in roaming. |
-| IPsec | Also UDP (IKE, ESP) and heavy to configure. |
-| SSH tunnel per instance | Encrypts and authenticates, but managing keys per instance, and having the server learn *who* sent the data, is awkward. Also adds a second process to supervise. |
-| Pre-shared key + HMAC in the application | Hand-rolled crypto, no forward secrecy, a shared secret per team to distribute. |
-| A broker with TLS (MQTT, NATS, Kafka) | Solves the same identity problem with mTLS anyway, plus a heavy component to run. See Part 3. |
+- **WireGuard** would be a good fit, but it's UDP and Toxiproxy only proxies TCP.
+  IPsec has the same problem and is heavier to configure.
+- **SSH tunnels** encrypt fine, but per-instance key management and letting the server
+  know *who* sent the data are awkward, and it's another process to supervise.
+- **PSK + HMAC** in the app is hand-rolled crypto with no forward secrecy.
+- **A broker** (MQTT, NATS, Kafka) ends up using mTLS for identity anyway, plus a
+  heavy component to run.
 
-**mTLS trade-offs, honestly:**
-
-- The CA key is the crown jewel. Here it is an unencrypted file on the deployment host,
-  to keep the demo non-interactive.
-- Certificates expire: leaves last 90 days, and `certs.sh` re-issues them when
-  `step certificate needs-renewal` says so.
-- There is no CRL/OCSP; the allowlist plays that role.
-- A private key on an instance that is captured is usable until the team is removed from
-  the allowlist. See [production](#what-i-would-change-for-production).
+Weak points: the CA key is an unencrypted file on the deployment host (to keep the demo
+non-interactive), there's no CRL/OCSP (the allowlist does that job), and a key on a
+captured instance works until the team is removed from `teams.txt`. Leaf certificates
+last 90 days.
 
 ## Part 3: The pipeline
 
-### Tooling: a small asyncio service in plain Python, no dependencies
+A small asyncio service in plain Python, standard library only, under 600 lines. It runs
+on the same base image as the simulator.
 
-I considered **Vector** and **Fluent Bit**, which are self-hosted shippers with UDP input,
-TLS and buffers. Their buffers fit this brief badly in two ways:
+I looked at Vector and Fluent Bit. Their disk buffers would write location history to
+the instance in plaintext, and I couldn't get the memory-only, byte-capped, drop-oldest
+buffer I wanted. Brokers add a stateful server and still need an agent at the edge. The
+cost of writing my own is that I own the protocol and its bugs.
 
-- Disk buffers write location history to the instance in plaintext.
-- They don't give me the drop-oldest, byte-capped, memory-only behavior I wanted.
+### Agent
 
-I also considered **brokers** (NATS JetStream, Kafka, MQTT with persistence). They add a
-stateful server to run, and they don't remove the need for an agent at the edge.
+Three loops, so a slow uplink never slows down reading from the GCS:
 
-The pipeline is about 600 lines of commented Python on the standard library only (`asyncio`,
-`ssl`, `zlib`, `sqlite3`). It runs in the same base image as the provided simulator, and
-every behavior the assignment grades is explicit in code I can explain line by line.
+1. **Ingest:** the UDP handler only appends the datagram to a list. Receive buffer is
+   1 MiB; datagrams over 2 KB are dropped (a real one is ~180 bytes).
+2. **Batcher:** every second, the pending messages (~100) become one zlib-compressed
+   batch. Costs up to 1 s of latency, makes the data ~10× smaller (18 KB/s → ~1.7 KB/s).
+3. **Sender:** one mTLS connection, sends batches oldest first, and only removes a batch
+   from memory when the receiver acks it.
 
-**Trade-off:** I own the protocol, so I own its bugs. With more time or more teams I would
-move the receiver's storage to a time-series database, and keep the agent.
+### Protocol
 
-### The agent: three loops, decoupled
+Each frame is a 4-byte length plus a body. `BATCH` is an 8-byte id plus the zlib data,
+`ACK` is the 8-byte id. Frames are capped at 1 MiB and decompression at 8 MiB, so a
+decompression bomb can't take down the receiver.
 
-1. **Ingest:** the UDP handler only appends the datagram to a list. No parsing, no I/O,
-   no locks, so nothing on the uplink can slow down reading the GCS. The receive buffer
-   is raised to 1 MiB. Datagrams over 2 KB are dropped, since a valid one is ~180 bytes.
-2. **Batcher:** every 1 s, the collected messages (~100) become one zlib-compressed batch
-   in the buffer. This adds at most 1 s of delay. In return the data is **~10× smaller**
-   (measured: 18 KB/s becomes ~1.7 KB/s), and TLS and framing overhead per message
-   becomes negligible.
-3. **Sender:** keeps one mTLS connection and sends batches oldest first. A batch leaves
-   memory only when the receiver **acks** it.
+### Receiver
 
-### Wire protocol
-
-Inside TLS, each frame is a 4-byte length plus a body:
-
-- `BATCH`: an 8-byte batch id plus the zlib data (agent to receiver).
-- `ACK`: the 8-byte batch id (receiver to agent).
-
-Frames are capped at 1 MiB and decompression at 8 MiB, which protects the receiver from
-decompression bombs.
-
-### The receiver
-
-For each connection:
-
-1. TLS handshake.
-2. Identity check.
-3. For each batch: validate every message (types, ranges, `team_id` = CN).
-4. Store the batch in **one SQLite transaction**.
-5. **Then** ack. Acking after the commit is what makes an acked batch durable.
-
-If an identity connects again while its old connection still looks alive, which is common
-after an outage, the newest connection wins. There is also a connection limit
-(`RECEIVER_MAX_CONNECTIONS`).
+Per connection: TLS handshake, identity check, then for each batch validate every
+message, store it in one SQLite transaction, and only then ack. If the same identity
+connects again (common after an outage, when the old connection is half dead) the new
+connection wins. There's also a connection limit.
 
 ## Part 4: Bad connectivity
 
-### Why application acks, and a window
+### Acks and a window
 
-NETWORK-SCENARIOS.md notes that under the bandwidth limit "a sender can keep writing for
-minutes before a write blocks", and Toxiproxy drops connections instantly on an outage.
-So a successful `write()` proves nothing, and anything in socket buffers or in the proxy
-when the link drops is gone.
+Under the bandwidth limit a sender can keep writing for minutes before a write blocks,
+and an outage drops whatever is sitting in socket buffers. So a successful `write()`
+proves nothing, and the agent waits for application-level acks.
 
-- **Acks:** the agent keeps every unacked batch. On disconnect, unacked batches go back
-  to the front of the buffer, in order.
-- **Window (64 KB of unacked data):** limits how much is in limbo at once, without
-  stop-and-wait. Stop-and-wait would cap throughput at one batch per round trip, about
-  5 s in the latency scenario. With the window, 3–4 batches are in flight there, and
-  throughput is unaffected.
-- **Watchdog:** if data is in flight and nothing has been acked for 30 s, the agent drops
-  the connection and reconnects. TCP alone can take many minutes to notice a dead path.
-  30 s is well above the ~5 s worst-case round trip of the latency scenario, so a slow
-  link is never mistaken for a dead one.
+- Unacked batches are kept, and go back to the front of the buffer on disconnect.
+- At most 64 KB is unacked at a time. Stop-and-wait would mean one batch per round trip
+  (~5 s with the latency scenario); with the window 3–5 batches are in flight and
+  throughput doesn't suffer.
+- If nothing has been acked for 30 s while data is in flight, the agent reconnects. TCP
+  alone can take many minutes to notice a dead path, and 30 s is well above the worst
+  round trip in the latency scenario.
 
-### Buffer size: what I chose and why
+### Buffer: memory only, 8 MB cap, drop oldest
 
-**Chosen: memory only, a hard cap in bytes (default 8 MB), drop oldest.**
+One team produces ~1.7 KB/s compressed, so 8 MB is about 75 minutes of outage. The
+10-minute scenario peaked at 1.09 MB. The cap is `AGENT_BUFFER_MAX_BYTES`.
 
-Sizing: one team produces ~1.7 KB/s compressed, so 8 MB holds **~75 minutes** of outage.
-The 10-minute scenario peaked at 1.08 MB. The cap is `AGENT_BUFFER_MAX_BYTES`. It is
-counted in compressed bytes because memory is the real limit.
+Why this policy:
 
-The brief's priorities are: individual messages have low value, the GCS must not be
-affected, and leaking locations is high risk. They rule out most options:
+- **Unbounded** would eventually run out of memory and crash, losing everything.
+- **Blocking** pushes back onto the GCS, which is fire-and-forget UDP, so the kernel
+  just drops new datagrams. That's drop-newest, but invisible.
+- **Drop newest** keeps the start of the outage and loses what's happening now, which is
+  the more useful data.
+- **Drop oldest** keeps the most recent window with predictable memory. This is what I
+  built.
 
-| Strategy | Consequence | Verdict |
-| -------- | ----------- | ------- |
-| Unbounded | A long outage exhausts memory, the agent crashes and *everything* is lost. Worst failure mode. | No |
-| Block when full | Backpressure ends at the GCS, which is fire-and-forget UDP: the kernel silently drops new datagrams. Same as drop-newest, but less visible. | No |
-| Drop newest | Keeps the start of the outage, loses what is happening now. Fresh data is worth more for jamming bubbles and fleet state. | No |
-| **Drop oldest** | Keeps the most recent window; loses the start of a very long outage. Memory is bounded and predictable. | **Yes** |
-| Downsample old data (e.g. keep 1 in 10 beyond N minutes) | Covers longer outages at lower resolution. 50 Hz is far more than flight-behavior analysis needs. | Good next step, not built |
-| Time-to-live (drop data older than X) | Useful if old data is worthless. Byte caps bound memory directly, TTL does not. | Can be combined |
+A good next step would be downsampling old data (50 Hz is far more than needed for
+analysis) before dropping it.
 
-### Does buffered data survive an agent or instance restart? No, on purpose.
+### The buffer doesn't survive a restart, on purpose
 
-The buffer holds location history. If an instance in the field is captured, everything on
-its disk is exposed. Writing the buffer to disk trades confidentiality (high risk) for
-delivery of data the brief calls low value. The options, in order of exposure:
+It's location history. If an instance is captured, everything on its disk is exposed,
+and the brief says individual messages are low value but leaking locations is high
+risk. Encrypting to disk only helps if the key lives somewhere safe like a TPM; a key on
+the same disk is the same as plaintext. So the buffer stays in RAM, and core dumps are
+disabled so a crash doesn't write it out either. The cost: a restarted agent loses its
+unacked buffer plus what arrives while it's down.
 
-| Option | Survives restart | Exposure if the instance is captured |
-| ------ | ---------------- | ------------------------------------ |
-| **Memory only (chosen)** | No | Only what is in RAM at that moment. Core dumps are disabled (`ulimit core 0`), so a crash does not write it out either. |
-| Disk, encrypted with a key held only in memory | No: the key dies with the process | None at rest, but no benefit over memory either. Only useful to keep RAM low for very large buffers. |
-| Disk, encrypted with a key in a TPM or HSM | Yes | Low, if the key cannot be extracted. Needs hardware support. |
-| Disk, encrypted with a key on the same disk | Yes | Same as plaintext: an attacker has both. |
-| Disk, plaintext (what Vector or Fluent Bit disk buffers do) | Yes | The full location history. |
+### Reconnecting without a stampede
 
-The cost is measured (see Part 5): an agent restart loses its unacked buffer, plus the
-datagrams that arrive while it is down (~100/s).
+- Exponential backoff with full jitter: wait a random time in
+  `[0, min(30 s, 1 s × 2^attempt)]`, reset once a connection gets an ack. If every team
+  loses the link at once, they don't all come back at the same moment.
+- The 64 KB window also limits the backlog, so even a full buffer is sent at the pace
+  the receiver acks.
+- On the receiver: a connection limit, 15 s handshake timeout, 120 s idle timeout.
 
-### Reconnecting without overloading the tactical server
+The trade-off is that a team can take up to 30 s to reconnect after a long outage. In
+the 10-minute scenario it took 0–17 s, and the backlog was gone within a few seconds.
 
-- **Exponential backoff with full jitter:** wait a random time in
-  `[0, min(30 s, 1 s × 2^attempt)]`, and reset after a connection gets at least one ack.
-  Instances that lost the link at the same moment, as all teams do in an outage of the
-  server's own link, spread their reconnects instead of arriving together.
-- **Backlog sent in limited windows:** each agent has at most 64 KB unacked, so even a full
-  8 MB buffer reaches the receiver at the receiver's own pace. The receiver controls the
-  rate by how fast it acks.
-- **On the receiver:** a connection limit, a 15 s handshake timeout, and a 120 s idle
-  timeout. An unlisted identity is refused, and its agent keeps backing off.
+### Delivery guarantee
 
-**Trade-off:** after a long outage, a team may reconnect up to 30 s after the link is back.
-In the 10-minute scenario it took 17–19 s, and the backlog was then sent within 7 s.
+At-least-once with deduplication. A batch is resent until acked, so if an ack gets lost
+the batch arrives twice; the primary key `(drone_id, seq, ts_ms)` with
+`INSERT OR IGNORE` drops the copy. `ts_ms` is in the key because `seq` restarts at 0
+when the simulator restarts.
 
-### Delivery guarantee: at-least-once, deduplicated, so effectively once
+Data usually arrives in order, but that isn't guaranteed across reconnects and nothing
+depends on it. Rows store `ts_ms` (GCS clock) and `received_ms` (server clock), and
+consumers sort by `ts_ms`.
 
-- **At-least-once:** a batch is resent until it is acked. Duplicates are expected when an
-  ack is lost: the batch was stored, but the ack never reached the agent.
-- **Duplicates:** the primary key `(drone_id, seq, ts_ms)` with `INSERT OR IGNORE`
-  discards a resent message. `ts_ms` is in the key because `seq` restarts at 0 when the
-  simulator restarts, so `seq` alone would collide with old data.
-- **Ordering:** each connection delivers in order, and requeued batches go back in
-  front. So in practice data is stored in order, but this is **not guaranteed across
-  reconnects**, and nothing depends on it. The receiver stores `ts_ms` (GCS clock) and
-  `received_ms` (server clock). Consumers order by `ts_ms`. A late batch, or one with a
-  skewed GCS clock, does not corrupt anything.
-- **Not exactly-once:** messages are lost when the cap is hit or the agent restarts,
-  because these are the designed trade-offs. Within those limits, nothing acked is lost
-  and nothing is stored twice.
+Messages are lost only when the cap is hit or the agent restarts, which are the
+designed trade-offs.
 
 ### Network restrictions
 
-- **Instances only make outbound connections:** agents dial out and listen only on UDP
-  4600 inside their team's LAN. No port is published from an agent or a GCS container.
-- **The tactical server exposes only what the pipeline needs:** the receiver listens on
-  7000, reachable only through Toxiproxy on the `tactical` network. Toxiproxy exposes one
-  port per team on `wan`. The Toxiproxy API is the only port on the host, on localhost,
-  and it stands in for the internet, so it is not part of the server.
+Agents only dial out; they listen on UDP 4600 inside their own team LAN. Nothing is
+published from an agent or GCS. The receiver listens on 7000, reachable only from
+Toxiproxy on the `tactical` network.
 
-## Part 5: Proof it works
+## Part 5: Results
 
-Each script prints its result and saves it to `results/`.
+| Check | Command | Expected |
+| ----- | ------- | -------- |
+| Every instance delivers | `make test-delivery` | `PASS` for every team |
+| Unknown instances rejected | `make test-rogue` | 4 × `PASS`: foreign CA, unlisted identity, no certificate, no rogue data stored |
 
-| Check | How | Expected |
-| ----- | --- | -------- |
-| Every instance delivers | `make test-delivery` | `PASS` for every team in `teams.txt` |
-| Unknown instances are rejected | `make test-rogue` | 4 × `PASS`: foreign CA, identity not allowed, no certificate, no rogue data stored |
-| Network scenarios | `make <scenario>` | See below |
+Network scenarios, run on Docker Desktop (macOS) against both teams at once. Full
+output is in `results/`.
 
-### Measured results
+| Scenario | Lost | Duplicates | Reconnected after restore | Delay p50 / max | Buffer peak |
+| -------- | ---- | ---------- | ------------------------- | --------------- | ----------- |
+| Baseline | 0 | 0 | – | 0.5 s / 1.0 s | 0 |
+| Short outage, 30 s | 0 | 0 | 6–15 s | 12–20 s / 37–45 s | 52–70 KB |
+| Long outage, 10 min | 0 | 0 | 0–17 s | 291–309 s / 601–619 s | 1.09 MB |
+| High latency, 2 s ± 0.5 s | 0 | 0 | no disconnect | 2.5 s / 3.5 s | 0 |
+| Low bandwidth, 10 KB/s | 0 | 0 | no disconnect | 0.7 s / 1.3 s | 0 |
 
-These runs used the same code, real Toxiproxy 2.12.0 and the exact API calls from
-NETWORK-SCENARIOS.md. They ran as local processes on Linux, 2 teams, both drones each.
-The Docker runs write their own numbers to `results/`.
+The outage delays are the buffer working: a message from the first second of a
+10-minute outage is delivered ~10 minutes late.
 
-Measured with Docker Desktop on macOS, the exact API calls from NETWORK-SCENARIOS.md,
-applied to both teams at once. The full output of each run is in `results/`.
+I also checked the designed losses by hand:
 
-| Scenario | Lost | Duplicates | Reconnects | Delivery delay (p50 / max) | Agent buffer peak |
-| -------- | ---- | ---------- | ---------- | -------------------------- | ----------------- |
-| Baseline | 0 | 0 | 0 | 0.5 s / 1.0 s | 0 |
-| Short outage, 30 s | 0 | 0 | after restore, 6–15 s later | 12–20 s / 37–45 s | 52–70 KB |
-| Long outage, 10 min | 0 | 0 | after restore, 0–17 s later | 291–309 s / 601–619 s | 1.09 MB of 8 MB |
-| High latency, 2 s ± 0.5 s | 0 | 0 | 0 | 2.5 s / 3.5 s | 0 (3–5 batches in flight) |
-| Low bandwidth, 10 KB/s | 0 | 0 | 0 | 0.7 s / 1.3 s | 0 (needs ~1.7 KB/s) |
+- **Cap:** with a 20 KB cap and a 30 s outage, the receiver got the last ~11 s of the
+  outage and was missing the first ~44 s. Memory stayed under the cap.
+- **Agent restart:** about 2 s of data lost (the buffer plus what arrived while down).
 
-How to read the outage delays: data built during the outage arrives after it. A message
-from the first second of a 10-minute outage is ~10 minutes late. That is the buffer
-doing its job, not a slow link.
+## What I'd do with more time
 
-Two more checks, run on purpose to show the designed losses:
+1. Unit tests for the buffer (cap, requeue order) and protocol (bad frames,
+   decompression bomb), and run the scenario scripts in CI.
+2. Downsample old data before dropping it.
+3. Prometheus metrics instead of log lines (buffer size, oldest age, drops, reconnects),
+   and an alert when a team goes silent.
+4. On SIGTERM, give the sender a few seconds to flush the buffer.
+5. Load-test the receiver with many instances reconnecting at once with full buffers.
 
-- **Cap (drop oldest):** a 20 KB cap and a 30 s outage. The receiver had the *last* ~11 s
-  of the outage and was missing the first ~44 s, exactly as designed. Memory stayed under
-  the cap the whole time.
-- **Agent restart:** about 2 s of data was lost: the in-memory buffer, plus what arrived
-  while the agent was down. This is the cost of not persisting location history.
+For production:
 
-## Part 1: Deployment and idempotency
-
-`make up` runs three steps, each idempotent:
-
-1. `scripts/generate.py`: writes `docker-compose.yml` and `toxiproxy/toxiproxy.json`
-   from `teams.txt`. The output is deterministic, and files are rewritten only when their
-   content changes. Both generated files are committed, so they can be reviewed, and say
-   at the top that they are generated.
-2. `scripts/certs.sh`: creates the CA and certificates only if they don't exist. A leaf
-   certificate is re-issued only when it is close to expiry. Keys are `0600` in a `0700`
-   directory, and everything lives in `certs/`, which is gitignored.
-3. `docker compose up -d --remove-orphans`: Compose converges to the declared
-   state. Unchanged containers are left running, and a team removed from `teams.txt`
-   loses its containers.
-
-Running `make up` a second time changes nothing: no files written, no certificates
-issued, no containers recreated.
-
-The first version did recreate every built container on the second run. It called
-`docker compose up --build`, and BuildKit attaches a provenance attestation with build
-metadata to each image, so identical code got a new image id on every build. Compose saw
-a "new" image and restarted the agents, which cost a few seconds of telemetry.
-`provenance: false` fixed it on Linux but is ignored by Docker Desktop's builder. The
-fix that holds everywhere: `make` rebuilds the images only when one of their source files
-changed (`.build-stamp`), and `up` itself never builds.
-
-Containers are hardened: read-only root filesystem, all capabilities dropped,
-`no-new-privileges`, non-root user, no core dumps, and a memory limit on the agents.
-
-**Toxiproxy ports** are `7001 + position in teams.txt`, so new teams are appended at
-the end. With Ansible or Kubernetes, each instance would get its own fixed address
-instead.
-
-## What I would change for production
-
-- **CA and keys:**
-  - Keep the root CA offline. Issue from an intermediate in `step-ca`, with short-lived
-    certificates (hours) renewed automatically over ACME or `step ca renew`.
-  - Generate each instance's key on the instance, in a TPM if it has one, so the
-    private key never leaves the device.
-- **Revocation:** short-lived certificates instead of CRLs, plus the allowlist for
-  immediate removal. Pin the allowlist on certificate fingerprints as well as CNs.
-- **Real nodes:** deploy the same images with Ansible, one instance per host. Run the
-  agent under systemd, or as a container with `restart: always`. Firewall: instances
-  outbound only, and the server inbound only on the pipeline port.
-- **Storage:** TimescaleDB or similar instead of SQLite. Encrypt the tactical server's
-  disk too, since it holds every team's locations.
-- **Observability:** Prometheus metrics instead of log lines: buffer bytes, oldest age,
-  drops, reconnects, acks per second, duplicates. Alert when a team has been silent
-  for X minutes.
-- **Downsampling** as the second stage of the buffer policy, to cover longer outages.
-- **Graceful shutdown:** on SIGTERM, give the sender a few seconds to send the buffer.
-- **Tests:** unit tests for `Buffer`, `protocol` and `parse`, and the scenario scripts
-  in CI.
-
-## What I would do next
-
-In this time box I prioritized a correct, explainable core and real proof of the four
-scenarios. Next, in order:
-
-1. Unit tests for the buffer (cap, requeue order) and the protocol (bad frames,
-   decompression bomb).
-2. Downsampling before dropping.
-3. Metrics endpoint.
-4. A receiver load test: many instances reconnecting at once with full buffers.
+- Keep the root CA offline, issue short-lived certificates (hours) from `step-ca` with
+  automatic renewal, and generate each instance's key on the device, ideally in a TPM.
+- Pin the allowlist on certificate fingerprints, not only CNs.
+- Deploy with Ansible, agent under systemd or `restart: always`, firewall instances to
+  outbound only.
+- TimescaleDB instead of SQLite, and an encrypted disk on the tactical server since it
+  holds every team's locations.

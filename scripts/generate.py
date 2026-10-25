@@ -31,9 +31,8 @@ x-hardened: &hardened
 x-pipeline: &pipeline
   <<: *hardened
   image: telemetry-pipeline:local
-  # provenance: false keeps the image id stable when nothing changed. With BuildKit's
-  # default attestation, every build gets a new id and Compose recreates the containers.
-  build: {context: ., dockerfile: Dockerfile, provenance: false}  
+  # provenance: false keeps the image id stable on Linux (see .build-stamp in the Makefile)
+  build: {context: ., dockerfile: Dockerfile, provenance: false}
   user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
 
 services:
@@ -120,7 +119,7 @@ def compose(names):
             f"  gcs-{team}:",
             "    <<: *hardened",
             "    image: telemetry-sim:local",
-            "    build: {context: gcs-sim, provenance: false}",  # provenance: false keeps the image id stable when nothing changed
+            "    build: {context: gcs-sim, provenance: false}",
             "    environment:",
             f"      SIM_TEAM_ID: {team}",
             f"      SIM_TARGET: agent-{team}:{GCS_PORT}",

@@ -1,9 +1,9 @@
 == telemetry from the last 30 s, per drone
-window 15:28:33 - 15:29:03
+window 16:34:28 - 16:34:58
 drone          stored  missing  delay p50      p95      max  largest gaps (seq)
-team-a-1         1492        0       0.5s     1.0s     1.0s  -
-team-a-2         1492        0       0.5s     1.0s     1.0s  -
-team-b-1         1494        0       0.5s     1.0s     1.0s  -
-team-b-2         1494        0       0.5s     1.0s     1.0s  -
+team-a-1         1500        0       0.5s     1.0s     1.0s  -
+team-a-2         1500        0       0.5s     1.0s     1.0s  -
+team-b-1         1500        0       0.5s     1.0s     1.0s  -
+team-b-2         1500        0       0.5s     1.0s     1.0s  -
 PASS team-a: data arrived
 PASS team-b: data arrived

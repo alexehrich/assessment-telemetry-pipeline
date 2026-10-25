@@ -41,7 +41,7 @@ trap restore EXIT
 echo "== $name on: $proxies"
 echo "   expected: $expect"
 start_s=$(date +%s); t0=$(now_ms)
-echo "   $(date +%T) start"
+echo "   $(date -u +%T) start"  # UTC, like the container logs
 
 case $name in
   short-outage|long-outage)
@@ -67,7 +67,7 @@ case $name in
 esac
 
 t1=$(now_ms)
-echo "   $(date +%T) restored, waiting ${SETTLE_S}s for buffers to drain"
+echo "   $(date -u +%T) restored, waiting ${SETTLE_S}s for buffers to drain"
 sleep "$SETTLE_S"
 
 for p in $proxies; do

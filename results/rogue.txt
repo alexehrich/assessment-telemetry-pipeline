@@ -1,28 +1,20 @@
 == starting rogue clients
- Container telemetry-pipeline-rogue-impersonator-1 Creating 
  Container telemetry-pipeline-rogue-unlisted-1 Creating 
- Container telemetry-pipeline-rogue-unlisted-1 Created 
+ Container telemetry-pipeline-rogue-impersonator-1 Creating 
  Container telemetry-pipeline-rogue-impersonator-1 Created 
+ Container telemetry-pipeline-rogue-unlisted-1 Created 
  Container telemetry-pipeline-rogue-impersonator-1 Starting 
  Container telemetry-pipeline-rogue-unlisted-1 Starting 
- Container telemetry-pipeline-rogue-unlisted-1 Started 
  Container telemetry-pipeline-rogue-impersonator-1 Started 
- Container telemetry-pipeline-rogue-unlisted-run-aa991be93dc9 Creating 
- Container telemetry-pipeline-rogue-unlisted-run-aa991be93dc9 Created 
+ Container telemetry-pipeline-rogue-unlisted-1 Started 
+ Container telemetry-pipeline-rogue-unlisted-run-78451bc0a779 Creating 
+ Container telemetry-pipeline-rogue-unlisted-run-78451bc0a779 Created 
 no-cert client: [Errno 32] Broken pipe
 
 == receiver log
-   1 rejected : TLS handshake failed: CERTIFICATE_VERIFY_FAILED
-   1 rejected : identity 'team-unlisted' is not an allowed instance
-   1 rejected : TLS handshake failed: PEER_DID_NOT_RETURN_A_CERTIFICATE
-   1 rejected : TLS handshake failed: CERTIFICATE_VERIFY_FAILED
-   1 rejected : identity 'team-unlisted' is not an allowed instance
-   1 rejected : identity 'team-unlisted' is not an allowed instance
-   1 rejected : TLS handshake failed: CERTIFICATE_VERIFY_FAILED
-   1 rejected : TLS handshake failed: CERTIFICATE_VERIFY_FAILED
-   1 rejected : identity 'team-unlisted' is not an allowed instance
-   1 rejected : identity 'team-unlisted' is not an allowed instance
-   1 rejected : TLS handshake failed: CERTIFICATE_VERIFY_FAILED
+   5 rejected: TLS handshake failed: CERTIFICATE_VERIFY_FAILED
+   1 rejected: TLS handshake failed: PEER_DID_NOT_RETURN_A_CERTIFICATE
+   6 rejected: identity 'team-unlisted' is not an allowed instance
 PASS certificate from another CA is rejected
 PASS identity not in teams.txt is rejected
 PASS client without certificate is rejected

@@ -19,6 +19,7 @@ import random
 import signal
 import socket
 import ssl
+import sys
 import time
 from dataclasses import dataclass
 
@@ -76,6 +77,18 @@ class Buffer:
             self.dropped_msgs += self.popleft().count
 
 
+class GcsListener(asyncio.DatagramProtocol):
+    def __init__(self, agent):
+        self.agent = agent
+
+    def datagram_received(self, data, addr):
+        if len(data) > MAX_DATAGRAM:
+            self.agent.stats["oversize"] += 1
+            return
+        self.agent.pending.append(data)
+        self.agent.stats["received"] += 1
+
+
 class Agent:
     def __init__(self):
         self.agent_id = env("AGENT_ID")
@@ -99,27 +112,12 @@ class Agent:
         self.connected = False
         self.stats = collections.Counter()
 
-    # ---- ingest -------------------------------------------------------------
-
-    class _UDP(asyncio.DatagramProtocol):
-        def __init__(self, agent):
-            self.agent = agent
-
-        def datagram_received(self, data, addr):
-            if len(data) > MAX_DATAGRAM:
-                self.agent.stats["oversize"] += 1
-                return
-            self.agent.pending.append(data)
-            self.agent.stats["received"] += 1
-
     async def start_ingest(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, RECV_BUFFER)
         sock.bind(self.listen)
-        await asyncio.get_running_loop().create_datagram_endpoint(lambda: self._UDP(self), sock=sock)
+        await asyncio.get_running_loop().create_datagram_endpoint(lambda: GcsListener(self), sock=sock)
         log.info("listening for GCS telemetry on udp %s:%d", *self.listen)
-
-    # ---- batcher ------------------------------------------------------------
 
     async def batcher(self):
         while True:
@@ -131,8 +129,6 @@ class Agent:
                                      len(messages), time.monotonic()))
             self.next_id += 1
             self.wake.set()
-
-    # ---- sender -------------------------------------------------------------
 
     async def sender(self):
         attempt = 0
@@ -227,8 +223,6 @@ class Agent:
             self.inflight.clear()
             self.inflight_bytes = 0
 
-    # ---- reporting ----------------------------------------------------------
-
     async def reporter(self):
         while True:
             await asyncio.sleep(10)
@@ -246,14 +240,10 @@ class Agent:
         await asyncio.gather(self.batcher(), self.sender(), self.reporter())
 
 
-def _exit(*_):
-    raise SystemExit(0)
-
-
 def main():
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s %(message)s")
     # Exit on SIGTERM. The in-memory buffer is lost by design (see README, Part 4).
-    signal.signal(signal.SIGTERM, _exit)
+    signal.signal(signal.SIGTERM, lambda *_: sys.exit(0))
     try:
         asyncio.run(Agent().run())
     except KeyboardInterrupt:

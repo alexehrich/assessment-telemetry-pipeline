@@ -16,6 +16,7 @@ import logging
 import signal
 import sqlite3
 import ssl
+import sys
 import time
 
 from . import protocol, tls
@@ -166,13 +167,9 @@ class Receiver:
             await asyncio.gather(server.serve_forever(), self.reporter())
 
 
-def _exit(*_):
-    raise SystemExit(0)
-
-
 def main():
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s %(message)s")
-    signal.signal(signal.SIGTERM, _exit)
+    signal.signal(signal.SIGTERM, lambda *_: sys.exit(0))
     try:
         asyncio.run(Receiver().run())
     except KeyboardInterrupt:
