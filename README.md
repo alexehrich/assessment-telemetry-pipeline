@@ -125,13 +125,8 @@ last 90 days.
 
 ## Part 3: The pipeline
 
-A small asyncio service in plain Python, standard library only, under 600 lines. It runs
+A small asyncio service in plain Python, standard library only. It runs
 on the same base image as the simulator.
-
-I looked at Vector and Fluent Bit. Their disk buffers would write location history to
-the instance in plaintext, and I couldn't get the memory-only, byte-capped, drop-oldest
-buffer I wanted. Brokers add a stateful server and still need an agent at the edge. The
-cost of writing my own is that I own the protocol and its bugs.
 
 ### Agent
 
