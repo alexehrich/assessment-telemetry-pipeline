@@ -1,0 +1,240 @@
+== long-outage on: team-a team-b 
+   expected: no loss (10 min is ~1 MB, cap is 8 MB); buffer drains within seconds of reconnecting
+   17:07:03 start
+   17:17:04 restored, waiting 60s for buffers to drain
+
+-- agent-team-a, every 10 s
+16:07:03 connection to tactical-server:7001 ended: server closed the connection
+16:07:04 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:07:04 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:07:05 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:07:06 connected=False buffered_batches=2 buffered_bytes=3563 oldest_buffered_s=2 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=10
+16:07:09 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:07:11 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:07:16 connected=False buffered_batches=12 buffered_bytes=21583 oldest_buffered_s=12 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=12
+16:07:22 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:07:26 connected=False buffered_batches=22 buffered_bytes=39718 oldest_buffered_s=22 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=13
+16:07:36 connected=False buffered_batches=32 buffered_bytes=57551 oldest_buffered_s=32 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=13
+16:07:38 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:07:42 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:07:46 connected=False buffered_batches=42 buffered_bytes=74899 oldest_buffered_s=42 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=15
+16:07:46 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:07:56 connected=False buffered_batches=52 buffered_bytes=92966 oldest_buffered_s=52 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=16
+16:08:04 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:08:06 connected=False buffered_batches=62 buffered_bytes=110956 oldest_buffered_s=62 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=17
+16:08:08 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:08:15 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:08:16 connected=False buffered_batches=72 buffered_bytes=129040 oldest_buffered_s=72 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=19
+16:08:26 connected=False buffered_batches=82 buffered_bytes=147084 oldest_buffered_s=82 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=19
+16:08:32 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:08:35 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:08:36 connected=False buffered_batches=92 buffered_bytes=164654 oldest_buffered_s=92 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=21
+16:08:37 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:08:46 connected=False buffered_batches=102 buffered_bytes=182392 oldest_buffered_s=102 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=22
+16:08:54 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:08:56 connected=False buffered_batches=112 buffered_bytes=200268 oldest_buffered_s=112 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=23
+16:09:06 connected=False buffered_batches=122 buffered_bytes=218351 oldest_buffered_s=122 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=23
+16:09:13 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:09:16 connected=False buffered_batches=132 buffered_bytes=236324 oldest_buffered_s=132 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=24
+16:09:24 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:09:26 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:09:26 connected=False buffered_batches=142 buffered_bytes=254155 oldest_buffered_s=142 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=26
+16:09:36 connected=False buffered_batches=152 buffered_bytes=271568 oldest_buffered_s=152 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=26
+16:09:40 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:09:46 connected=False buffered_batches=162 buffered_bytes=289681 oldest_buffered_s=162 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=27
+16:09:56 connected=False buffered_batches=172 buffered_bytes=307818 oldest_buffered_s=172 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=27
+16:10:00 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:10:06 connected=False buffered_batches=182 buffered_bytes=326054 oldest_buffered_s=182 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=28
+16:10:16 connected=False buffered_batches=192 buffered_bytes=343998 oldest_buffered_s=192 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=28
+16:10:26 connected=False buffered_batches=202 buffered_bytes=361395 oldest_buffered_s=202 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=28
+16:10:28 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:10:36 connected=False buffered_batches=212 buffered_bytes=379222 oldest_buffered_s=212 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=29
+16:10:44 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:10:46 connected=False buffered_batches=222 buffered_bytes=397297 oldest_buffered_s=222 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=30
+16:10:46 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:10:47 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:10:56 connected=False buffered_batches=232 buffered_bytes=415420 oldest_buffered_s=232 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=32
+16:11:06 connected=False buffered_batches=242 buffered_bytes=433284 oldest_buffered_s=242 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=32
+16:11:12 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:11:12 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:11:16 connected=False buffered_batches=252 buffered_bytes=450630 oldest_buffered_s=252 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=34
+16:11:26 connected=False buffered_batches=261 buffered_bytes=466774 oldest_buffered_s=262 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=34
+16:11:34 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:11:36 connected=False buffered_batches=271 buffered_bytes=484751 oldest_buffered_s=272 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=35
+16:11:46 connected=False buffered_batches=281 buffered_bytes=502813 oldest_buffered_s=282 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=35
+16:11:56 connected=False buffered_batches=291 buffered_bytes=520817 oldest_buffered_s=292 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=35
+16:12:02 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:12:06 connected=False buffered_batches=301 buffered_bytes=538343 oldest_buffered_s=302 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=36
+16:12:16 connected=False buffered_batches=311 buffered_bytes=556030 oldest_buffered_s=312 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=36
+16:12:26 connected=False buffered_batches=321 buffered_bytes=574047 oldest_buffered_s=322 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=36
+16:12:31 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:12:36 connected=False buffered_batches=331 buffered_bytes=592177 oldest_buffered_s=332 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=37
+16:12:46 connected=False buffered_batches=341 buffered_bytes=610185 oldest_buffered_s=342 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=37
+16:12:56 connected=False buffered_batches=351 buffered_bytes=627963 oldest_buffered_s=352 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=37
+16:12:58 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:13:06 connected=False buffered_batches=361 buffered_bytes=645283 oldest_buffered_s=362 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=38
+16:13:07 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:13:16 connected=False buffered_batches=371 buffered_bytes=663239 oldest_buffered_s=372 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=39
+16:13:19 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:13:26 connected=False buffered_batches=381 buffered_bytes=681434 oldest_buffered_s=382 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=40
+16:13:36 connected=False buffered_batches=391 buffered_bytes=699420 oldest_buffered_s=392 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=40
+16:13:42 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:13:46 connected=False buffered_batches=401 buffered_bytes=717267 oldest_buffered_s=402 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=41
+16:13:56 connected=False buffered_batches=411 buffered_bytes=734557 oldest_buffered_s=412 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=41
+16:14:06 connected=False buffered_batches=421 buffered_bytes=752426 oldest_buffered_s=422 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=41
+16:14:12 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:14:16 connected=False buffered_batches=431 buffered_bytes=770499 oldest_buffered_s=432 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=42
+16:14:19 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:14:26 connected=False buffered_batches=441 buffered_bytes=788366 oldest_buffered_s=442 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=43
+16:14:36 connected=False buffered_batches=451 buffered_bytes=806219 oldest_buffered_s=452 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=43
+16:14:46 connected=False buffered_batches=461 buffered_bytes=823584 oldest_buffered_s=462 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=43
+16:14:49 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:14:56 connected=False buffered_batches=471 buffered_bytes=841379 oldest_buffered_s=472 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=44
+16:15:06 connected=False buffered_batches=481 buffered_bytes=859388 oldest_buffered_s=482 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=44
+16:15:15 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:15:16 connected=False buffered_batches=491 buffered_bytes=877589 oldest_buffered_s=492 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=45
+16:15:26 connected=False buffered_batches=501 buffered_bytes=895593 oldest_buffered_s=502 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=45
+16:15:36 connected=False buffered_batches=511 buffered_bytes=913191 oldest_buffered_s=512 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=45
+16:15:40 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:15:46 connected=False buffered_batches=521 buffered_bytes=931093 oldest_buffered_s=522 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=46
+16:15:51 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:15:56 connected=False buffered_batches=531 buffered_bytes=949216 oldest_buffered_s=532 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=47
+16:16:06 connected=False buffered_batches=541 buffered_bytes=967375 oldest_buffered_s=542 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=47
+16:16:14 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:16:16 connected=False buffered_batches=551 buffered_bytes=985550 oldest_buffered_s=552 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=48
+16:16:23 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:16:26 connected=False buffered_batches=561 buffered_bytes=1003204 oldest_buffered_s=562 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=49
+16:16:36 connected=False buffered_batches=571 buffered_bytes=1020802 oldest_buffered_s=572 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=49
+16:16:38 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+16:16:46 connected=False buffered_batches=581 buffered_bytes=1038990 oldest_buffered_s=582 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=50
+16:16:56 connected=False buffered_batches=590 buffered_bytes=1055321 oldest_buffered_s=592 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=50
+16:17:04 connected to tactical-server:7001 (TLSv1.3)
+16:17:06 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=50
+16:17:16 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=50
+16:17:26 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=50
+16:17:36 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=50
+16:17:46 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=50
+16:17:56 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=50
+
+-- agent-team-b, every 10 s
+16:07:03 connection to tactical-server:7002 ended: server closed the connection
+16:07:03 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:07:05 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:07:06 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:07:06 connected=False buffered_batches=2 buffered_bytes=3582 oldest_buffered_s=2 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=11
+16:07:07 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:07:16 connected=False buffered_batches=12 buffered_bytes=21603 oldest_buffered_s=12 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=12
+16:07:18 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:07:26 connected=False buffered_batches=22 buffered_bytes=39656 oldest_buffered_s=22 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=13
+16:07:36 connected=False buffered_batches=32 buffered_bytes=57484 oldest_buffered_s=32 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=13
+16:07:45 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:07:46 connected=False buffered_batches=42 buffered_bytes=74850 oldest_buffered_s=42 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=14
+16:07:56 connected=False buffered_batches=52 buffered_bytes=92734 oldest_buffered_s=52 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=14
+16:08:06 connected=False buffered_batches=62 buffered_bytes=110699 oldest_buffered_s=62 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=14
+16:08:13 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:08:16 connected=False buffered_batches=72 buffered_bytes=128688 oldest_buffered_s=72 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=15
+16:08:26 connected=False buffered_batches=82 buffered_bytes=146675 oldest_buffered_s=82 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=15
+16:08:36 connected=False buffered_batches=92 buffered_bytes=164276 oldest_buffered_s=92 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=15
+16:08:40 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:08:46 connected=False buffered_batches=102 buffered_bytes=181856 oldest_buffered_s=102 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=16
+16:08:56 connected=False buffered_batches=112 buffered_bytes=199674 oldest_buffered_s=112 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=16
+16:09:01 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:09:06 connected=False buffered_batches=122 buffered_bytes=217781 oldest_buffered_s=122 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=17
+16:09:14 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:09:16 connected=False buffered_batches=132 buffered_bytes=235669 oldest_buffered_s=132 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=18
+16:09:26 connected=False buffered_batches=142 buffered_bytes=253362 oldest_buffered_s=142 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=18
+16:09:35 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:09:36 connected=False buffered_batches=152 buffered_bytes=270730 oldest_buffered_s=152 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=19
+16:09:42 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:09:46 connected=False buffered_batches=162 buffered_bytes=288702 oldest_buffered_s=162 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=20
+16:09:56 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:09:56 connected=False buffered_batches=172 buffered_bytes=306779 oldest_buffered_s=172 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=21
+16:10:06 connected=False buffered_batches=182 buffered_bytes=324936 oldest_buffered_s=182 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=21
+16:10:12 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:10:16 connected=False buffered_batches=192 buffered_bytes=342864 oldest_buffered_s=192 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=22
+16:10:26 connected=False buffered_batches=202 buffered_bytes=360148 oldest_buffered_s=202 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=22
+16:10:34 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:10:36 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:10:36 connected=False buffered_batches=212 buffered_bytes=377972 oldest_buffered_s=212 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=24
+16:10:46 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:10:46 connected=False buffered_batches=222 buffered_bytes=396034 oldest_buffered_s=222 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=25
+16:10:50 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:10:55 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:10:56 connected=False buffered_batches=232 buffered_bytes=414138 oldest_buffered_s=232 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=27
+16:11:06 connected=False buffered_batches=242 buffered_bytes=431927 oldest_buffered_s=242 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=27
+16:11:16 connected=False buffered_batches=252 buffered_bytes=449189 oldest_buffered_s=252 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=27
+16:11:21 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:11:26 connected=False buffered_batches=261 buffered_bytes=465314 oldest_buffered_s=262 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=28
+16:11:36 connected=False buffered_batches=271 buffered_bytes=483192 oldest_buffered_s=272 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=28
+16:11:46 connected=False buffered_batches=281 buffered_bytes=501308 oldest_buffered_s=282 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=28
+16:11:48 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:11:56 connected=False buffered_batches=291 buffered_bytes=519294 oldest_buffered_s=292 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=29
+16:11:59 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:12:06 connected=False buffered_batches=301 buffered_bytes=536763 oldest_buffered_s=302 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=30
+16:12:16 connected=False buffered_batches=311 buffered_bytes=554432 oldest_buffered_s=312 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=30
+16:12:26 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:12:26 connected=False buffered_batches=321 buffered_bytes=572444 oldest_buffered_s=322 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=31
+16:12:31 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:12:36 connected=False buffered_batches=331 buffered_bytes=590488 oldest_buffered_s=332 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=32
+16:12:38 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:12:46 connected=False buffered_batches=341 buffered_bytes=608502 oldest_buffered_s=342 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=33
+16:12:56 connected=False buffered_batches=351 buffered_bytes=626212 oldest_buffered_s=352 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=33
+16:13:00 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:13:06 connected=False buffered_batches=361 buffered_bytes=643565 oldest_buffered_s=362 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=34
+16:13:16 connected=False buffered_batches=371 buffered_bytes=661528 oldest_buffered_s=372 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=34
+16:13:18 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:13:26 connected=False buffered_batches=381 buffered_bytes=679594 oldest_buffered_s=382 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=35
+16:13:36 connected=False buffered_batches=391 buffered_bytes=697540 oldest_buffered_s=392 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=35
+16:13:43 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:13:46 connected=False buffered_batches=401 buffered_bytes=715331 oldest_buffered_s=402 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=36
+16:13:56 connected=False buffered_batches=411 buffered_bytes=732538 oldest_buffered_s=412 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=36
+16:13:58 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:14:06 connected=False buffered_batches=421 buffered_bytes=750335 oldest_buffered_s=422 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=37
+16:14:11 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:14:16 connected=False buffered_batches=431 buffered_bytes=768419 oldest_buffered_s=432 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=38
+16:14:21 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:14:26 connected=False buffered_batches=441 buffered_bytes=786348 oldest_buffered_s=442 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=39
+16:14:36 connected=False buffered_batches=451 buffered_bytes=804266 oldest_buffered_s=452 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=39
+16:14:45 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:14:46 connected=False buffered_batches=461 buffered_bytes=821565 oldest_buffered_s=462 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=40
+16:14:56 connected=False buffered_batches=471 buffered_bytes=839398 oldest_buffered_s=472 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=40
+16:15:06 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:15:06 connected=False buffered_batches=481 buffered_bytes=857391 oldest_buffered_s=482 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=41
+16:15:16 connected=False buffered_batches=491 buffered_bytes=875503 oldest_buffered_s=492 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=41
+16:15:20 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:15:26 connected=False buffered_batches=501 buffered_bytes=893514 oldest_buffered_s=502 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=42
+16:15:36 connected=False buffered_batches=511 buffered_bytes=911045 oldest_buffered_s=512 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=42
+16:15:40 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:15:46 connected=False buffered_batches=521 buffered_bytes=928930 oldest_buffered_s=522 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=43
+16:15:47 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:15:56 connected=False buffered_batches=531 buffered_bytes=947033 oldest_buffered_s=532 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=44
+16:16:06 connected=False buffered_batches=541 buffered_bytes=965230 oldest_buffered_s=542 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=44
+16:16:11 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:16:16 connected=False buffered_batches=551 buffered_bytes=983357 oldest_buffered_s=552 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=45
+16:16:23 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:16:26 connected=False buffered_batches=561 buffered_bytes=1001018 oldest_buffered_s=562 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=46
+16:16:30 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:16:36 connected=False buffered_batches=571 buffered_bytes=1018733 oldest_buffered_s=572 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=47
+16:16:37 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:16:46 connected=False buffered_batches=581 buffered_bytes=1036803 oldest_buffered_s=582 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=48
+16:16:48 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:16:56 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+16:16:56 connected=False buffered_batches=590 buffered_bytes=1053159 oldest_buffered_s=592 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=50
+16:17:06 connected=False buffered_batches=600 buffered_bytes=1071275 oldest_buffered_s=602 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=50
+16:17:16 connected=False buffered_batches=610 buffered_bytes=1089272 oldest_buffered_s=612 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=50
+16:17:21 connected to tactical-server:7002 (TLSv1.3)
+16:17:26 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=50
+16:17:36 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=50
+16:17:46 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=50
+16:17:56 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=50
+
+-- receiver: telemetry built during the scenario (+-10 s)
+window 16:06:53 - 16:17:14
+drone          stored  missing  delay p50      p95      max  largest gaps (seq)
+team-a-1        31045        0     291.2s   570.1s   601.0s  -
+team-a-2        31045        0     291.2s   570.1s   601.0s  -
+team-b-1        31046        0     308.5s   587.5s   618.5s  -
+team-b-2        31046        0     308.5s   587.5s   618.5s  -
+
+2026-10-25 16:17:57,409 receiver INFO team-a connected=True batches=1655 stored=166084 duplicates=0 invalid=0
+2026-10-25 16:17:57,410 receiver INFO team-b connected=True batches=1655 stored=166084 duplicates=0 invalid=0

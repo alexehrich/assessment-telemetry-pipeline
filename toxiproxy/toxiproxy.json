@@ -1,0 +1,14 @@
+[
+  {
+    "name": "team-a",
+    "listen": "0.0.0.0:7001",
+    "upstream": "receiver:7000",
+    "enabled": true
+  },
+  {
+    "name": "team-b",
+    "listen": "0.0.0.0:7002",
+    "upstream": "receiver:7000",
+    "enabled": true
+  }
+]

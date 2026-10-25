@@ -1,0 +1,7 @@
+# Secrets and runtime data never enter the repository.
+certs/
+data/
+__pycache__/
+*.pyc
+.DS_Store
+.build-stamp

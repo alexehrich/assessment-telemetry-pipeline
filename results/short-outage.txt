@@ -1,0 +1,54 @@
+== short-outage on: team-a team-b 
+   expected: no loss; data of the outage arrives up to ~30 s late plus the reconnect backoff
+   16:51:06 start
+   16:51:36 restored, waiting 60s for buffers to drain
+
+-- agent-team-a, every 10 s
+15:51:06 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=0
+15:51:06 connection to tactical-server:7001 ended: server closed the connection
+15:51:07 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+15:51:08 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+15:51:11 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+15:51:11 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+15:51:16 connected=False buffered_batches=9 buffered_bytes=15705 oldest_buffered_s=9 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=5
+15:51:25 connection to tactical-server:7001 ended: [Errno 111] Connect call failed ('172.24.0.3', 7001)
+15:51:26 connected=False buffered_batches=19 buffered_bytes=33635 oldest_buffered_s=19 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:51:36 connected=False buffered_batches=29 buffered_bytes=51793 oldest_buffered_s=29 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:51:42 connected to tactical-server:7001 (TLSv1.3)
+15:51:46 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:51:56 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:52:06 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:52:16 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:52:26 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:52:36 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=6
+
+-- agent-team-b, every 10 s
+15:51:06 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=0
+15:51:06 connection to tactical-server:7002 ended: server closed the connection
+15:51:06 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+15:51:06 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+15:51:07 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+15:51:13 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+15:51:16 connected=False buffered_batches=9 buffered_bytes=15762 oldest_buffered_s=9 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=5
+15:51:26 connected=False buffered_batches=19 buffered_bytes=33626 oldest_buffered_s=19 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=5
+15:51:26 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+15:51:34 connection to tactical-server:7002 ended: [Errno 111] Connect call failed ('172.24.0.3', 7002)
+15:51:36 connected=False buffered_batches=29 buffered_bytes=51655 oldest_buffered_s=29 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:51:46 connected=False buffered_batches=39 buffered_bytes=69736 oldest_buffered_s=39 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:51:51 connected to tactical-server:7002 (TLSv1.3)
+15:51:56 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:52:06 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:52:16 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:52:26 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:52:36 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=7
+
+-- receiver: telemetry built during the scenario (+-10 s)
+window 15:50:56 - 15:51:46
+drone          stored  missing  delay p50      p95      max  largest gaps (seq)
+team-a-1         2511        0      11.7s    34.3s    36.8s  -
+team-a-2         2511        0      11.8s    34.3s    36.8s  -
+team-b-1         2512        0      20.0s    42.5s    45.0s  -
+team-b-2         2512        0      20.0s    42.5s    45.0s  -
+
+2026-10-25 15:52:36,096 receiver INFO team-a connected=True batches=139 stored=13942 duplicates=0 invalid=0
+2026-10-25 15:52:36,097 receiver INFO team-b connected=True batches=139 stored=13942 duplicates=0 invalid=0

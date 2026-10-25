@@ -1,0 +1,91 @@
+== high-latency on: team-a team-b 
+   expected: no loss, no reconnects; delay about 2-3 s higher for the duration
+   16:53:35 start
+   16:58:35 restored, waiting 60s for buffers to drain
+
+-- agent-team-a, every 10 s
+15:53:36 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=1 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:53:46 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=5 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:53:56 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:54:06 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:54:16 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:54:26 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:54:36 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:54:46 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:54:56 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:55:06 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:55:16 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:55:26 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:55:36 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=5 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:55:46 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:55:56 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=3 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:56:06 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:56:16 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:56:26 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:56:36 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:56:46 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:56:56 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=3 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:57:06 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=3 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:57:16 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:57:26 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=3 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:57:36 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:57:46 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=3 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:57:56 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=5 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:58:06 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:58:16 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:58:26 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:58:36 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:58:46 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:58:56 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:59:06 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:59:16 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=6
+15:59:26 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=6
+
+-- agent-team-b, every 10 s
+15:53:36 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=1 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:53:46 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=5 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:53:56 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=5 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:54:06 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:54:16 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=5 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:54:26 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:54:36 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:54:46 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:54:56 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:55:06 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:55:16 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:55:26 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:55:36 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:55:46 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=5 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:55:56 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:56:06 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:56:16 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:56:26 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:56:36 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:56:46 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:56:56 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:57:06 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:57:16 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:57:26 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=5 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:57:36 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=3 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:57:46 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:57:56 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:58:06 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=4 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:58:16 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=5 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:58:26 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=5 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:58:36 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:58:46 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:58:56 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:59:06 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:59:16 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=7
+15:59:26 connected=True buffered_batches=0 buffered_bytes=0 oldest_buffered_s=0 inflight=0 dropped_by_cap=0 resent_batches=0 reconnects=7
+
+-- receiver: telemetry built during the scenario (+-10 s)
+window 15:53:25 - 15:58:45
+drone          stored  missing  delay p50      p95      max  largest gaps (seq)
+team-a-1        16021        0       2.5s     3.2s     3.5s  -
+team-a-2        16021        0       2.5s     3.2s     3.5s  -
+team-b-1        16021        0       2.5s     3.2s     3.5s  -
+team-b-2        16021        0       2.5s     3.2s     3.5s  -
+
+2026-10-25 15:59:36,264 receiver INFO team-a connected=True batches=558 stored=55984 duplicates=0 invalid=0
+2026-10-25 15:59:36,264 receiver INFO team-b connected=True batches=558 stored=55984 duplicates=0 invalid=0
